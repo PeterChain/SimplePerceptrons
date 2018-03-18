@@ -1,0 +1,30 @@
+# Binary testset
+# This model serves to classify a credit rate as good (1) or bad (0)
+# The structure of the file will be:
+# A - Rate of credit loans (higher means more credits taken)
+# B - Rate of paid loans (higher means more credits paid)
+# Each batch of training consists of 4 training cases (2 positive, 2 negative)
+
+# First batch
+4 4 1
+4 0 0
+4 2 1
+8 1 0
+
+# Second batch
+12 6 1
+11 2 0
+0 0 1
+1 0 0
+
+# Third batch
+21 17 1
+21 3 0
+1 1 1
+29 1 0
+
+# fourth batch
+40 39 1
+30 6 0
+30 15 1
+20 1 0 
