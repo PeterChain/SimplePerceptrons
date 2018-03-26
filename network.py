@@ -7,7 +7,7 @@ learning rate. manipulating these values will produce different set of results
 import numpy as np
 
 
-def adjust_learning(input_vector, weight_vector):
+def adjust_learning(input_vector, weight_vector, learning_rate):
     pass
 
 
