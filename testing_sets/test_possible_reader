@@ -1,0 +1,21 @@
+# Binary testset
+# This model serves to classify if a given user is a good book reader or not
+# The classification considers the following criteria:
+# No. of books read in a month (integer)
+# Buys at least one physical book per quarter (1 if true, 0 otherwise)
+# Buyer of school books (must not be a buyer) (1 if true, 0 otherwise)
+# Member of at least 3 reading clubs (Integer, number of clubs)
+
+10 1 0 3 1
+8 1 0 3 0
+11 1 0 10 1
+20 0 0 5 0
+30 1 0 10 1
+30 1 1 5 0
+11 1 0 20 1
+9 1 0 20 0
+31 0 0 0 0
+12 1 0 12 1
+0 0 0 0 0
+19 1 0 10 1
+0 1 0 2 0

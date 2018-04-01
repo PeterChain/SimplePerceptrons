@@ -1,7 +1,7 @@
 import sys
-import network
+from random import randint
+from network import *
 
-LEARNING_RATE = 0.10
 
 def load_dataset(filename):
     """Loads the dataset into an array of inputs
@@ -17,11 +17,13 @@ def load_dataset(filename):
 
     fp = open(filename, 'r')
     for line in fp:
+        line = line.replace('\n', '')
+        line = line.replace('\r', '')
         if len(line) == 0:
             continue
         if line[0] == '#':
             continue
-        file_array.append(line.split(' '))
+        file_array.append(map(float, line.split(' ')))
     fp.close()
     return file_array
 
@@ -34,7 +36,7 @@ def write_dataset(filename, file_array):
         filename {String} -- Name of the destination file
         file_array {Array} -- Array of entries
     """
-    line = ' '.join((str(e) for e in file_array)
+    line = ' '.join((str(e) for e in file_array))
 
     fp = open(filename, 'w')
     fp.write(line)
@@ -47,9 +49,9 @@ def new_weight_vector(size):
     Arguments:
         size {Integer} -- Size of the array
     """
-    result_array = [size]
-    for e in result_array:
-        e = randint(0, 100)
+    result_array = [None] * size
+    for index, e in enumerate(result_array):
+        result_array[index] = randint(0, 10)
     return result_array
 
 
@@ -62,45 +64,63 @@ def run_test(filename):
     Arguments:
         filename {String} -- test case file
     """
+    error_count = 0
+
     try:
-        file_array = load_dataset(filename)
-    except OSError as error:
+        input_array = load_dataset(filename)
+    except EnvironmentError as error:
         print(str(error))
         quit()
-
-    # Build the input array
-    input_vector = []
-    for entry in file_array:
-        input_vector.append(entry[:len(entry)-1])
     
     # Check that input vector is not initial
-    if not input_vector:
+    if not input_array:
         print("Input vector is initial")
         quit()
     
+    # import ipdb; ipdb.set_trace()
+
     # Determine if there is a weight array, if not initialize
     # one with random values
     try:
-        weight_array = load_dataset(filename + '_w')
-    except OSError:
-        weight_vector_size = len(input_vector[0])
-        weight_array = new_weight_vector(weight_vector_size)
+        weight_vector = load_dataset(filename + '_w')[0]
+    except EnvironmentError:
+        weight_vector_size = len(input_array[0]) - 1 # to exclude desired output value
+        weight_vector = new_weight_vector(weight_vector_size)
     
+    print("Current weight vector:")
+    print(weight_vector)
+
+
+    for index, sample in enumerate(input_array):
+        print("Sample #" + str(index + 1))
+
+        # Build the input vector (without the desired output)
+        input_vector = sample[:len(sample)-1]
+        desired = sample[len(sample)-1]
+        target = activation_function(input_vector, weight_vector)
+        if desired == target:
+            print("No Adjusment is needed")
+            continue
+        
+        error = desired - target
+        error_count += 1
+        weight_vector = adjust_learning(error, input_vector, weight_vector)
+        print("Adjusted weight vectors:")
+        print(weight_vector)
     
-    
+    print("Error count: " + str(error_count) + " in total number of " + str(len(input_array)) + " samples")
+    write_dataset(filename + '_w', weight_vector)
 
 if __name__ == '__main__':
-    if sys.argv != 3:
+    if len(sys.argv) != 3:
         print("Usage: <program name> <mode> <path_to_set>")
         quit()
     
-    if sys.argv[1] = 'run':
+    if sys.argv[1] == 'run':
         run_case(sys.argv[2])
-    elif sys.argv[1] = 'train':
+    elif sys.argv[1] == 'train':
         run_test(sys.argv[2])
     else:
         print("Invalid mode: select either 'train' or 'run'")
         quit()
-
-    #weight_set = sys.argv[2] + '_w'
     
