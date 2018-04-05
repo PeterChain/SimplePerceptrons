@@ -1,5 +1,5 @@
 import sys
-from random import randint
+from random import uniform
 from network import *
 
 
@@ -51,7 +51,7 @@ def new_weight_vector(size):
     """
     result_array = [None] * size
     for index, e in enumerate(result_array):
-        result_array[index] = randint(0, 10)
+        result_array[index] = uniform(0, 1)
     return result_array
 
 
@@ -84,7 +84,7 @@ def run_test(filename):
     try:
         weight_vector = load_dataset(filename + '_w')[0]
     except EnvironmentError:
-        weight_vector_size = len(input_array[0]) - 1 # to exclude desired output value
+        weight_vector_size = len(input_array[0]) #Input array plus bias
         weight_vector = new_weight_vector(weight_vector_size)
     
     print("Current weight vector:")
@@ -94,8 +94,9 @@ def run_test(filename):
     for index, sample in enumerate(input_array):
         print("Sample #" + str(index + 1))
 
-        # Build the input vector (without the desired output)
-        input_vector = sample[:len(sample)-1]
+        # Build the input vector (without the desired output) and
+        # with position zero with a bias of one
+        input_vector = [1] + sample[:len(sample)-1]
         desired = sample[len(sample)-1]
         target = activation_function(input_vector, weight_vector)
         if desired == target:
