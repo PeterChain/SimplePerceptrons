@@ -56,13 +56,14 @@ def new_weight_vector(size):
 
 
 
-def run_test(filename):
+def run_test(filename, iterations):
     """Execute the simple perceptron network
        with a test file that includes the expected
        result value (that won't be entering the network)
     
     Arguments:
         filename {String} -- test case file
+        iterations {Integer} -- number of times that a dataset will be run
     """
     error_count = 0
 
@@ -76,8 +77,6 @@ def run_test(filename):
     if not input_array:
         print("Input vector is initial")
         quit()
-    
-    # import ipdb; ipdb.set_trace()
 
     # Determine if there is a weight array, if not initialize
     # one with random values
@@ -89,38 +88,41 @@ def run_test(filename):
     
     print("Current weight vector:")
     print(weight_vector)
-
-
-    for index, sample in enumerate(input_array):
-        print("Sample #" + str(index + 1))
-
-        # Build the input vector (without the desired output) and
-        # with position zero with a bias of one
-        input_vector = [1] + sample[:len(sample)-1]
-        desired = sample[len(sample)-1]
-        target = activation_function(input_vector, weight_vector)
-        if desired == target:
-            print("No Adjusment is needed")
-            continue
-        
-        error = desired - target
-        error_count += 1
-        weight_vector = adjust_learning(error, input_vector, weight_vector)
-        print("Adjusted weight vectors:")
-        print(weight_vector)
     
-    print("Error count: " + str(error_count) + " in total number of " + str(len(input_array)) + " samples")
+    set = []
+    for line in input_array:
+        set.append( ([line[:len(line)-1], line[len(line)-1]]) )
+
+
+    total_run = 0
+    total_errors = 0
+    for _ in range(iterations):
+        print("Iteration: " + str(_))
+        ret = train_network(set, weight_vector)
+        weight_vector = ret['weights']
+        total_run += ret['runs']
+        total_errors += ret['errors']
+    
+    # import ipdb; ipdb.set_trace()
+    percent_error = (total_errors * 100) / total_run
+    
+    print("Ran " + str(total_run) + " samples. With " + str(percent_error) + "% of errors")    
     write_dataset(filename + '_w', weight_vector)
 
+
 if __name__ == '__main__':
-    if len(sys.argv) != 3:
-        print("Usage: <program name> <mode> <path_to_set>")
+    if len(sys.argv) < 3:
+        print("Usage: <program name> <mode> <path_to_set> [<iterations> (only for train)]")
         quit()
     
     if sys.argv[1] == 'run':
         run_case(sys.argv[2])
     elif sys.argv[1] == 'train':
-        run_test(sys.argv[2])
+        try:
+            iter = int(sys.argv[3])
+        except:
+            iter = 1
+        run_test(sys.argv[2], iter)
     else:
         print("Invalid mode: select either 'train' or 'run'")
         quit()
